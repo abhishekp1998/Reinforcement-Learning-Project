@@ -68,7 +68,49 @@ class QLearning:
             average reward over the first s steps, rewards[1] should contain
             the average reward over the next s steps, etc.
         """
-        raise NotImplementedError()
+        state_action_values = np.zeros((env.observation_space.n,env.action_space.n))
+        rewards = []
+        s = np.floor(steps / 100)
+        s = int(s)
+        done = False
+        numActions = {}
+        dictlist = [dict() for x in range(env.observation_space.n)]
+        currentState = env.reset()
+        progress = 0
+        currentstep = 0
+
+        for i in range(steps):
+          currentstep += 1
+          progress = (currentstep/steps)
+
+          if(np.random.random_sample() < self._get_epsilon(progress)):
+            action = env.action_space.sample()
+          else:
+            action = np.argmax(state_action_values[currentState])
+
+          if(action in dictlist[currentState]):
+            dictlist[currentState][action] += 1
+          else:
+            dictlist[currentState][action] = 1
+          
+          stepSize = (1/dictlist[currentState][action])
+          
+          nextState, reward, done,_ = env.step(action)
+          state_action_values[currentState][action] = state_action_values[currentState][action] + (stepSize * (reward + (self.discount * np.max(state_action_values[nextState])) - state_action_values[currentState][action]))
+          rewards.append(reward)
+          currentState = nextState
+          
+          if(done == True):
+            currentState = env.reset()
+        
+        rows = (steps/s)
+        rows = int(rows)
+        rewards = np.asarray(rewards)
+        rewards = rewards.reshape((rows,s))
+        rewardsagg = np.mean(rewards, axis = 1)
+
+
+        return state_action_values, rewardsagg
 
     def predict(self, env, state_action_values):
         """
@@ -103,7 +145,23 @@ class QLearning:
             over the course  of the episode. Should be of length K, where K is
             the number of steps taken within the episode.
         """
-        raise NotImplementedError()
+        done = False
+        states = [] 
+        actions = []
+        rewards = [] 
+        count = 0
+        currentState = env.reset()
+
+        while (done != True):
+          action = np.argmax(state_action_values[currentState])
+          newState, reward, done,_ = env.step(action)
+          states.append(newState)
+          rewards.append(reward)
+          actions.append(action)
+          currentState = newState
+          count += 1
+
+        return np.asarray(states), np.asarray(actions), np.asarray(rewards)
 
     def _get_epsilon(self, progress):
         """
