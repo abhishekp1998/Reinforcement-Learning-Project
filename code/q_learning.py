@@ -73,7 +73,6 @@ class QLearning:
         s = np.floor(steps / 100)
         s = int(s)
         done = False
-        numActions = {}
         dictlist = [dict() for x in range(env.observation_space.n)]
         currentState = env.reset()
         progress = 0
@@ -187,4 +186,7 @@ class QLearning:
             progress - (float) A value between 0 and 1 that indicates the
                 training progess. Equivalent to current_step / steps.
         """
-        raise NotImplementedError()
+        epsilon = self.epsilon
+        epsilon = (1-progress) * epsilon
+         
+        return epsilon
