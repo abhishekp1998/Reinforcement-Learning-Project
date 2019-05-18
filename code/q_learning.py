@@ -8,7 +8,7 @@ class QLearning:
     Arguments:
       epsilon - (float) The probability of randomly exploring the action space
         rather than exploiting the best action.
-      discount - (float) The discount factor. Controls the perceived value of
+      discount - (float) The discount factor. Controls the percived value of
         future reward relative to short-term reward.
       adaptive - (bool) Whether to use an adaptive policy for setting
         values of epsilon during training
